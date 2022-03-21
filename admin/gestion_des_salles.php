@@ -33,6 +33,8 @@ $maps = "";
 
 
 
+
+
 //----------------------------------------------------------
 // ------------------------------- REGIST ROOM 
 //----------------------------------------------------------
@@ -60,6 +62,9 @@ if(isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['pays'
   if(!empty($_POST['photo_actuelle'])){
     $photo = $_POST['photo_actuelle'];
   }
+  if(!empty($_POST['maps_actuelle'])){
+    $maps = $_POST['maps_actuelle'];
+  }
 
   // verif photo
   if(!empty($_FILES['photo']['name'])){
@@ -71,8 +76,28 @@ if(isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['pays'
       $photo = $titre . '-' . $_FILES['photo']['name'];
       $photo = preg_replace('/[^a-zA-Z0-9._-]/', '', $photo);
 
-      $dossier_cible = ROOT_PATH . ROOT_SITE .'assets/img_produit/' . $photo;
+      $dossier_cible = ROOT_PATH . ROOT_SITE .'assets/img_salles/' . $photo;
       copy($_FILES['photo']['tmp_name'], $dossier_cible );
+    } 
+    else {  
+      $msg .= '<div class = "alert alert-danger mb-3"> Attention,<br>la photo n\'a pas un format valide pour le web.</div>';
+      $erreur = true ;
+    }
+
+  }
+
+  // verif maps
+  if(!empty($_FILES['maps']['name'])){
+    $tab_formats = array('png','jpg','gif','webp');
+    $extension = strrchr($_FILES['maps']['name'], '.'); 
+    $extension = strtolower(substr($extension, 1));
+    if(in_array($extension, $tab_formats)){
+
+      $maps = $titre . '-' . $_FILES['maps']['name'];
+      $maps = preg_replace('/[^a-zA-Z0-9._-]/', '', $maps);
+
+      $dossier_cible = ROOT_PATH . ROOT_SITE .'assets/img_maps/' . $maps;
+      copy($_FILES['maps']['tmp_name'], $dossier_cible );
     } 
     else {  
       $msg .= '<div class = "alert alert-danger mb-3"> Attention,<br>la photo n\'a pas un format valide pour le web.</div>';
@@ -122,9 +147,9 @@ include '../inc/header.inc.php';
 include '../inc/nav.inc.php';
 
 
-// echo '<pre>';
-// print_r($_POST);
-// echo '</pre>';
+echo '<pre>';
+print_r($_POST);
+echo '</pre>';
 
 ?>
 
@@ -185,9 +210,9 @@ include '../inc/nav.inc.php';
               <div class="mb-3">
                     <label for="categorie">Catégorie</label>
                     <select name="categorie" id="categorie" class="form-control">
-                      <option value="<?php if($categorie == "reunion"){echo 'selected';} ?>">Réunion</option>
-                      <option value="<?php if($categorie == "bureau"){echo 'selected';} ?>">Bureau</option>
-                      <option value="<?php if($categorie == "formaion"){echo 'selected';} ?>">Formation</option>
+                      <option value="<?php if($categorie == 'reunion'){echo 'selected';} ?>">Réunion</option>
+                      <option value="<?php if($categorie == 'bureau'){echo 'selected';} ?>">Bureau</option>
+                      <option value="<?php if($categorie == 'formation'){echo 'selected';} ?>">Formation</option>
                     </select>
               </div>
           </div>
@@ -209,9 +234,20 @@ include '../inc/nav.inc.php';
               <label for="cp">Code Postal</label>
               <input type="text" class="form-control" name="cp" id="cp" placeholder="Indiquer un Code Postal..."  >
             </div>
+
+            <?php
+                  if(!empty($maps_actuelle)){
+                    echo '<div class="mb-3"';
+                    echo '<label for"maps_actuelle">maps actuelle</label><hr>';
+                    echo 'img src="' . URL . 'assets/img/img_maps' . $maps_actuelle . '" width="100">';
+                    echo 'input type="hidden" name="maps_acutelle" value"' . $maps_actuelle .'">';
+                    echo '</div>';
+                  }
+              ?>
+
             <div class="mb-3">
                     <label for="maps">Localisation</label>
-                    <textarea class="form-control" name="maps" id="maps"></textarea>
+                    <input type="file" id="maps" name="maps" class="form-control">
               </div>
             <div class="mb-3">
             <button type="submit" class="btn btn-outline-dark" id="enregistrer">Enregistrer</button>    
@@ -219,6 +255,54 @@ include '../inc/nav.inc.php';
           </div>
       </div>
                 </form>
+
+      <div class="row mt-4">
+        <div class="col-12">
+          <table class="table table-bordered">
+            <thead class="bg-dark text-white text-center">
+              <tr>
+                <th>Id Salle</th>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Photo</th>
+                <th>Capacité</th>
+                <th>Catégorie</th>
+                <th>Pays</th>
+                <th>Ville</th>
+                <th>Adresse</th>
+                <th>Code Postal</th>
+                <th>Localisation</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php 
+                while($ligne = $liste_salles->fetch(PDO::FETCH_ASSOC)){
+                  echo '<tr>';
+                  echo '<td>' . $ligne['id_salle'] . '</td>';
+                  echo '<td>' . $ligne['titre'] . '</td>';
+                  echo '<td>' . substr($ligne['description'], 0, 30) . '</td>';
+                  echo '<td><img src="' . URL . 'assets/img_salles/'. $ligne['photo'] . '" width="100" </td>';
+                  echo '<td>' . $ligne['capacite'] . '</td>';
+                  echo '<td>' . $ligne['categorie'] . '</td>';
+                  echo '<td>' . $ligne['pays'] . '</td>';
+                  echo '<td>' . $ligne['ville'] . '</td>';
+                  echo '<td>' . $ligne['adresse'] . '</td>';
+                  echo '<td>' . $ligne['cp'] . '</td>';
+                  echo '<td>' . $ligne['maps'] . '</td>';
+
+                  echo '<td class="mx-3"> <a href="?action=edit&id_salle=' . $ligne['id_salle'] . '"class="btn btn-outline-dark"> <i class="fa-solid fa-pen-to-square"></i></a> <a href="?action=delete&id_salle=' . $ligne['id_salle'] . '"class="btn btn-outline-dark" onclick="return(confirm(\'Êtes-vous sûr de vouloir supprimer cette salle?\'))"> <i class="fa-solid fa-ban"></i></a> </td>';
+                  
+                  echo '</tr>';
+                }
+              
+              
+              
+              ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
   </div>
 
 
