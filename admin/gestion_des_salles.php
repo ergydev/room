@@ -51,6 +51,32 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete' && !empty($_GET['id_sal
 }
 
 
+//----------------------------------------------------------
+// ------------------------------- UPDATE ROOM 
+//----------------------------------------------------------
+
+if (isset($_GET['action']) && $_GET['action'] == 'edit' && !empty($_GET['id_salle'])){
+  $recup_room = $pdo->prepare("SELECT * FROM salle WHERE id_salle = :id_salle");
+  $recup_room->bindParam(':id_salle', $_GET['id_salle'], PDO::PARAM_STR);
+  $recup_room->execute();
+
+  if($recup_room->rowCount()> 0){
+    $infos_room = $recup_room->fetch(PDO::FETCH_ASSOC);
+    
+    $id_salle = $infos_room['id_salle'];
+    $titre = $infos_room['titre'];
+    $description = $infos_room['description'];
+    $photo = $infos_room['photo'];
+    $pays = $infos_room['pays'];
+    $ville = $infos_room['ville'];
+    $adresse = $infos_room['adresse'];
+    $cp = $infos_room['cp'];
+    $capacite = $infos_room['capacite'];
+    $categorie = $infos_room['categorie'];
+    $maps = $infos_room['maps'];
+    
+  }
+}
 
 
 
@@ -166,9 +192,9 @@ include '../inc/header.inc.php';
 include '../inc/nav.inc.php';
 
 
-echo '<pre>';
-print_r($_POST);
-echo '</pre>';
+// echo '<pre>';
+// print_r($_POST);
+// echo '</pre>';
 
 ?>
 
