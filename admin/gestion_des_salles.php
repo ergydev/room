@@ -40,7 +40,7 @@ $maps = "";
 
 if(isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['pays']) && isset($_POST['ville']) && isset($_POST['adresse']) && isset($_POST['cp']) && isset($_POST['capacite']) && isset($_POST['categorie'])  && isset($_POST['maps'])){
 
-  echo "test";
+
   $titre = trim($_POST['titre']);
   $description = trim($_POST['description']);
   $pays = trim($_POST['pays']);
@@ -63,12 +63,12 @@ if(isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['pays'
 
   // verif photo
   if(!empty($_FILES['photo']['name'])){
-    $_tab_formats = array('png','jpg','gif','webp');
+    $tab_formats = array('png','jpg','gif','webp');
     $extension = strrchr($_FILES['photo']['name'], '.'); 
     $extension = strtolower(substr($extension, 1));
     if(in_array($extension, $tab_formats)){
 
-      $photo = $reference . '-' . $_FILES['photo']['name'];
+      $photo = $titre . '-' . $_FILES['photo']['name'];
       $photo = preg_replace('/[^a-zA-Z0-9._-]/', '', $photo);
 
       $dossier_cible = ROOT_PATH . ROOT_SITE .'assets/img_produit/' . $photo;
@@ -122,9 +122,9 @@ include '../inc/header.inc.php';
 include '../inc/nav.inc.php';
 
 
-echo '<pre>';
-print_r($_POST);
-echo '</pre>';
+// echo '<pre>';
+// print_r($_POST);
+// echo '</pre>';
 
 ?>
 
