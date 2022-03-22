@@ -29,7 +29,54 @@ $maps = "";
 // ------------------------------- DELETE ROOM 
 //----------------------------------------------------------
 
+if(isset($_GET['action']) && $_GET['action'] == 'delete' && !empty($_GET['id_salle']) ){
+  $del_photo = $pdo->prepare("SELECT * FROM salle where id_salle = :id_salle");
+  $del_photo->bindParam('id_salle', $_GET['id_salle'], PDO::PARAM_STR);
+  $del_photo->execute();
 
+  if($del_photo->rowCount()>0){
+    $infos = $del_photo->fetch();
+    $chemin_photo = ROOT_PATH . ROOT_SITE . 'assets/img_salles' . $infos['photo'];
+    $chemin_maps = ROOT_PATH . ROOT_SITE . 'assets/img_maps' . $infos['maps'];
+    if(!empty($infos['photo']) && !empty($infos['maps']) && file_exists($chemin_maps) && file_exists($chemin_photo)){
+      unlink($chemin_photo);
+      unlink($chemin_maps);
+    }
+  }
+
+  $supression = $pdo->prepare("DELETE FROM salle WHERE id_salle = :id_salle");
+  $supression->bindParam(':id_salle', $_GET['id_salle'], PDO::PARAM_STR);
+  $supression->execute();
+  $msg = '<div class = "alert alert-danger mb-3">La salle a bien été supprimée</div>';
+}
+
+
+//----------------------------------------------------------
+// ------------------------------- UPDATE ROOM 
+//----------------------------------------------------------
+
+if (isset($_GET['action']) && $_GET['action'] == 'edit' && !empty($_GET['id_salle'])){
+  $recup_room = $pdo->prepare("SELECT * FROM salle WHERE id_salle = :id_salle");
+  $recup_room->bindParam(':id_salle', $_GET['id_salle'], PDO::PARAM_STR);
+  $recup_room->execute();
+
+  if($recup_room->rowCount()> 0){
+    $infos_room = $recup_room->fetch(PDO::FETCH_ASSOC);
+    
+    $id_salle = $infos_room['id_salle'];
+    $titre = $infos_room['titre'];
+    $description = $infos_room['description'];
+    $photo = $infos_room['photo'];
+    $pays = $infos_room['pays'];
+    $ville = $infos_room['ville'];
+    $adresse = $infos_room['adresse'];
+    $cp = $infos_room['cp'];
+    $capacite = $infos_room['capacite'];
+    $categorie = $infos_room['categorie'];
+    $maps = $infos_room['maps'];
+    
+  }
+}
 
 
 
@@ -38,7 +85,7 @@ $maps = "";
 //----------------------------------------------------------
 // controls 
 
-if(isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['pays']) && isset($_POST['ville']) && isset($_POST['adresse']) && isset($_POST['cp']) && isset($_POST['capacite']) && isset($_POST['categorie'])  && isset($_POST['maps'])){
+if(isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['pays']) && isset($_POST['ville']) && isset($_POST['adresse']) && isset($_POST['cp']) && isset($_POST['capacite']) && isset($_POST['categorie'])){
 
 
   $titre = trim($_POST['titre']);
@@ -49,7 +96,7 @@ if(isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['pays'
   $cp = trim($_POST['cp']);
   $capacite = trim($_POST['capacite']);
   $categorie = trim($_POST['categorie']);
-  $maps = trim($_POST['maps']);
+
 
   $erreur = false;
 
@@ -59,6 +106,9 @@ if(isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['pays'
   }
   if(!empty($_POST['photo_actuelle'])){
     $photo = $_POST['photo_actuelle'];
+  }
+  if(!empty($_POST['maps_actuelle'])){
+    $maps = $_POST['maps_actuelle'];
   }
 
   // verif photo
@@ -71,8 +121,28 @@ if(isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['pays'
       $photo = $titre . '-' . $_FILES['photo']['name'];
       $photo = preg_replace('/[^a-zA-Z0-9._-]/', '', $photo);
 
-      $dossier_cible = ROOT_PATH . ROOT_SITE .'assets/img_produit/' . $photo;
+      $dossier_cible = ROOT_PATH . ROOT_SITE .'assets/img_salles/' . $photo;
       copy($_FILES['photo']['tmp_name'], $dossier_cible );
+    } 
+    else {  
+      $msg .= '<div class = "alert alert-danger mb-3"> Attention,<br>la photo n\'a pas un format valide pour le web.</div>';
+      $erreur = true ;
+    }
+
+  }
+
+  // verif maps
+  if(!empty($_FILES['maps']['name'])){
+    $tab_formats2 = array('png','jpg','gif','webp');
+    $extension = strrchr($_FILES['maps']['name'], '.'); 
+    $extension = strtolower(substr($extension, 1));
+    if(in_array($extension, $tab_formats2)){
+
+      $maps = $titre . '-' . $_FILES['maps']['name'];
+      $maps = preg_replace('/[^a-zA-Z0-9._-]/', '', $maps);
+
+      $dossier_cible2 = ROOT_PATH . ROOT_SITE .'assets/img_maps/' . $maps;
+      copy($_FILES['maps']['tmp_name'], $dossier_cible2 );
     } 
     else {  
       $msg .= '<div class = "alert alert-danger mb-3"> Attention,<br>la photo n\'a pas un format valide pour le web.</div>';
@@ -185,9 +255,9 @@ include '../inc/nav.inc.php';
               <div class="mb-3">
                     <label for="categorie">Catégorie</label>
                     <select name="categorie" id="categorie" class="form-control">
-                      <option value="<?php if($categorie == "reunion"){echo 'selected';} ?>">Réunion</option>
-                      <option value="<?php if($categorie == "bureau"){echo 'selected';} ?>">Bureau</option>
-                      <option value="<?php if($categorie == "formaion"){echo 'selected';} ?>">Formation</option>
+                      <option value="<?php if($categorie == 'reunion'){echo 'selected';} ?>">Réunion</option>
+                      <option value="<?php if($categorie == 'bureau'){echo 'selected';} ?>">Bureau</option>
+                      <option value="<?php if($categorie == 'formation'){echo 'selected';} ?>">Formation</option>
                     </select>
               </div>
           </div>
@@ -209,9 +279,20 @@ include '../inc/nav.inc.php';
               <label for="cp">Code Postal</label>
               <input type="text" class="form-control" name="cp" id="cp" placeholder="Indiquer un Code Postal..."  >
             </div>
+
+            <?php
+                  if(!empty($maps_actuelle)){
+                    echo '<div class="mb-3"';
+                    echo '<label for"maps_actuelle">maps actuelle</label><hr>';
+                    echo 'img src="' . URL . 'assets/img/img_maps' . $maps_actuelle . '" width="100">';
+                    echo 'input type="hidden" name="maps_acutelle" value"' . $maps_actuelle .'">';
+                    echo '</div>';
+                  }
+              ?>
+
             <div class="mb-3">
                     <label for="maps">Localisation</label>
-                    <textarea class="form-control" name="maps" id="maps"></textarea>
+                    <input type="file" id="maps" name="maps" class="form-control">
               </div>
             <div class="mb-3">
             <button type="submit" class="btn btn-outline-dark" id="enregistrer">Enregistrer</button>    
@@ -219,6 +300,54 @@ include '../inc/nav.inc.php';
           </div>
       </div>
                 </form>
+
+      <div class="row mt-4">
+        <div class="col-12">
+          <table class="table table-bordered">
+            <thead class="bg-dark text-white text-center">
+              <tr>
+                <th>Id Salle</th>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Photo</th>
+                <th>Capacité</th>
+                <th>Catégorie</th>
+                <th>Pays</th>
+                <th>Ville</th>
+                <th>Adresse</th>
+                <th>Code Postal</th>
+                <th>Localisation</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php 
+                while($ligne = $liste_salles->fetch(PDO::FETCH_ASSOC)){
+                  echo '<tr>';
+                  echo '<td>' . $ligne['id_salle'] . '</td>';
+                  echo '<td>' . $ligne['titre'] . '</td>';
+                  echo '<td>' . substr($ligne['description'], 0, 30) . '</td>';
+                  echo '<td><img src="' . URL . 'assets/img_salles/'. $ligne['photo'] . '" width="100" </td>';
+                  echo '<td>' . $ligne['capacite'] . '</td>';
+                  echo '<td>' . $ligne['categorie'] . '</td>';
+                  echo '<td>' . $ligne['pays'] . '</td>';
+                  echo '<td>' . $ligne['ville'] . '</td>';
+                  echo '<td>' . $ligne['adresse'] . '</td>';
+                  echo '<td>' . $ligne['cp'] . '</td>';
+                  echo '<td><img src="' . URL . 'assets/img_maps/' . $ligne['maps'] . '" width="100" </td>';
+
+                  echo '<td class="mx-3"> <a href="?action=edit&id_salle=' . $ligne['id_salle'] . '"class="btn btn-outline-dark"> <i class="fa-solid fa-pen-to-square"></i></a> <a href="?action=delete&id_salle=' . $ligne['id_salle'] . '"class="btn btn-outline-dark" onclick="return(confirm(\'Êtes-vous sûr de vouloir supprimer cette salle?\'))"> <i class="fa-solid fa-ban"></i></a> </td>';
+                  
+                  echo '</tr>';
+                }
+              
+              
+              
+              ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
   </div>
 
 
