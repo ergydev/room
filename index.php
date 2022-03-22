@@ -5,11 +5,11 @@ include 'inc/functions.inc.php';
 //CODE .... 
 
 // Recup des catégories
-$liste_categorie = $pdo->query("SELECT DISTINCT categorie FROM produit ORDER BY categorie");
+$liste_categorie = $pdo->query("SELECT DISTINCT categorie FROM produit, salle WHERE salle.id_salle = produit.id_salle ORDER BY categorie");
 
-$liste_ville = $pdo->query("SELECT DISTINCT ville FROM produit ORDER BY ville");
+$liste_ville = $pdo->query("SELECT DISTINCT ville FROM produit, salle WHERE salle.id_salle = produit.id_salle ORDER BY ville");
 
-$liste_capacite = $pdo->query("SELECT DISTINCT capacite FROM produit ORDER BY capacite");
+$liste_capacite = $pdo->query("SELECT DISTINCT capacite FROM produit, salle WHERE salle.id_salle = produit.id_salle ORDER BY capacite");
 
 
 // Recup des produits 
@@ -31,6 +31,8 @@ if(isset($_GET['categorie'])){
   $rechercher = '%' . $_GET['rechercher'] . '%';
   $liste_produits->bindParam(':rechercher', $_GET['rechercher'], PDO::PARAM_STR);
   $liste_produits->execute();
+} else{
+  $liste_produits = $pdo->query("SELECT * FROM produit, salle WHERE salle.id_salle = produit.id_salle ORDER BY categorie, titre");
 }
 
 
@@ -65,13 +67,32 @@ include 'inc/nav.inc.php';
           ?>
 
           <h3 class="pb-3 mt-3 border-bottom">Catégories</h3>
-          <ul class="list-group">
+          <ul class="list-group filtres">
             <?php
               while($categorie = $liste_categorie->fetch(PDO::FETCH_ASSOC)){
                 echo '<li class="list-group-item"><a href="?categorie=' . $categorie['categorie'] . '">' . $categorie['categorie'] . '</a></li>';
               }
             ?>
           </ul>
+
+          <h3 class="pb-3 mt-3 border-bottom">Villes</h3>
+          <ul class="list-group filtres">
+            <?php
+              while($ville = $liste_ville->fetch(PDO::FETCH_ASSOC)){
+                echo '<li class="list-group-item"><a href="?ville=' . $ville['ville'] . '">' . $ville['ville'] . '</a></li>';
+              }
+            ?>
+          </ul>
+
+          <h3 class="pb-3 mt-3 border-bottom">Capacités</h3>
+          <ul class="list-group filtres">
+            <?php
+              while($capacite = $liste_capacite->fetch(PDO::FETCH_ASSOC)){
+                echo '<li class="list-group-item"><a href="?capacite=' . $capacite['capacite'] . '">' . $capacite['capacite'] . '</a></li>';
+              }
+            ?>
+          </ul>
+
         </div>
       </div>
   </div>
