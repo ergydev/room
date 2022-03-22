@@ -58,7 +58,7 @@ include 'inc/nav.inc.php';
       
       </div>
       <div class="row">
-        <div class="col-sm-3">
+        <div class="col-sm-2">
           <?php
 
               if(!empty($_GET)){
@@ -93,6 +93,33 @@ include 'inc/nav.inc.php';
             ?>
           </ul>
 
+        </div>
+        <div class="col-sm-10">
+          <h3 class="pb-3 border-bottom">Découvrez nos espaces</h3>
+          <div class="row">
+            <?php 
+
+            if($liste_produits->rowCount()>0){
+              while($produit = $liste_produits->fetch(PDO::FETCH_ASSOC)){
+
+                echo '<div class ="col-lg-3 col-md-4 col-sm-6 mb-3">';
+                echo '<div class="card">
+                <img src="'. URL . 'assets/img_salles/' . $produit['photo'] . '" class="card-img-top" alt="Image produi : '. $produit['titre'] . '" > <div class="card-body">
+                <h5 class="card-title">' . $produit['titre'] . '</h5>
+                <p class="card-text"><span class="fw-bold">Catégorie : </span>' . $produit['categorie'] . '</p><p class="fw-bold fs-5">Prix : ' . $produit['prix'] . ' €</p>
+                <p class="card-text"><span class="fw-bold">Jusqu\'à ' . $produit['capacite'] . ' personne(s)</span></p>
+                <p class="card-text"><span class="fw-bold">Actuellement :</span> ' . $produit['etat'] . '</p>
+                <p cmass="card-text"><span class="fw-bold">Réservez du :</span> ' . $produit['date_arrive'] . ' <br> <span class="fw-bold">au</span> ' . $produit['date_arrive'] . '</p>
+                <a href="fiche_produit.php.?id_produit=' . $produit['id_produit']. '" class="btn btn-outline-dark w-100">Réserver</a>
+                </div>
+                </div>';
+                echo '</div>';
+              }
+            } else{
+              echo '<div class="col-12 text-center text-green mt-3"><h3>Auncun résultat ne correspond à votre recherche.</h3></div>' ;
+            }
+            ?>
+          </div>
         </div>
       </div>
   </div>

@@ -31,13 +31,13 @@ if(isset($_GET['action']) && isset($_GET['action']) == 'delete' && !empty($_GET[
     $del->bindParam(':id_produit', $_GET['id_produit'], PDO::PARAM_STR);
     $del->execute();
 
-    // if($del->rowCount()>0){
-    //     $infos = $del->fetch();
-    //     $chemin_photo = ROOT_PATH . ROOT_SITE . 'assets/img_salles' . $infos['photo'];
-    //     if(!empty($chemin_photo) && file_exists($chemin_photo)){
-    //         unlink($chemin_photo);
-    //     }
-    // }
+    if($del->rowCount()>0){
+        $infos = $del->fetch();
+        $chemin_photo = ROOT_PATH . ROOT_SITE . 'assets/img_salles' . $infos['photo'];
+        if(!empty($chemin_photo) && file_exists($chemin_photo)){
+            unlink($chemin_photo);
+        }
+    }
 
     $suppression = $pdo->prepare("DELETE FROM produit WHERE id_produit = :id_produit");
     $suppression->bindParam(':id_produit', $_GET['id_produit'], PDO::PARAM_STR);
