@@ -172,8 +172,8 @@ if(isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['pays'
       $enregistrement->bindParam(':maps', $maps, PDO::PARAM_STR);
       $enregistrement->execute();
 
-      // header('location: gestion_des_salles.php');
-      // exit();
+      header('location: gestion_des_salles.php');
+      exit();
     }
         // Message si modification 
         if(!empty($_SESSION['message_utlisateur'])){
@@ -255,9 +255,9 @@ include '../inc/nav.inc.php';
               <div class="mb-3">
                     <label for="categorie">Catégorie</label>
                     <select name="categorie" id="categorie" class="form-control">
-                      <option value="<?php if($categorie == 'reunion'){echo 'selected';} ?>">Réunion</option>
-                      <option value="<?php if($categorie == 'bureau'){echo 'selected';} ?>">Bureau</option>
-                      <option value="<?php if($categorie == 'formation'){echo 'selected';} ?>">Formation</option>
+                      <option value="reunion">Réunion</option>
+                      <option value="bureau">Bureau</option>
+                      <option value="formation">Formation</option>
                     </select>
               </div>
           </div>
