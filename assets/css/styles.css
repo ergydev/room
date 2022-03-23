@@ -31,6 +31,12 @@ a {
     text-transform: uppercase;
 }
 
+.product-bot a {
+    text-decoration: none;
+    color: black;
+    
+}
+
 img{
     max-width: 100%;
 }
