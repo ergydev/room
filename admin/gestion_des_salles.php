@@ -326,7 +326,7 @@ include '../inc/nav.inc.php';
                   echo '<tr>';
                   echo '<td>' . $ligne['id_salle'] . '</td>';
                   echo '<td>' . $ligne['titre'] . '</td>';
-                  echo '<td>' . substr($ligne['description'], 0, 30) . '</td>';
+                  echo '<td>' . $ligne['description'] . '</td>';
                   echo '<td><img src="' . URL . 'assets/img_salles/'. $ligne['photo'] . '" width="100" </td>';
                   echo '<td>' . $ligne['capacite'] . '</td>';
                   echo '<td>' . $ligne['categorie'] . '</td>';

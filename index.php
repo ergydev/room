@@ -124,11 +124,12 @@ include 'inc/nav.inc.php';
                 echo '<div class="card">
                 <img src="'. URL . 'assets/img_salles/' . $produit['photo'] . '" class="card-img-top" alt="Image produi : '. $produit['titre'] . '" > <div class="card-body">
                 <h5 class="card-title">' . $produit['titre'] . '</h5>
-                <p class="card-text"><span class="fw-bold">Catégorie : </span>' . $produit['categorie'] . '</p><p class="fw-bold fs-5">Prix : ' . $produit['prix'] . ' €</p>
+                <p class="card-text"> ' . substr($produit['description'], 0 , 30) . '...</p>
+                <p class="fw-bold fs-5">Prix : ' . $produit['prix'] . ' €</p>
                 <p class="card-text"><span class="fw-bold">Jusqu\'à ' . $produit['capacite'] . ' personne(s)</span></p>
                 <p class="card-text"><span class="fw-bold">Actuellement :</span> ' . $produit['etat'] . '</p>
                 <p cmass="card-text"><span class="fw-bold">Réservez du :</span> ' . $produit['date_arrive'] . ' <br> <span class="fw-bold">au</span> ' . $produit['date_arrive'] . '</p>
-                <a href="fiche_produit.php.?id_produit=' . $produit['id_produit']. '" class="btn btn-outline-dark w-100">Réserver</a>
+                <a href="fiche_produit.php.?id_produit=' . $produit['id_produit']. '" class="btn btn-outline-dark w-100">Découvrir</a>
                 </div>
                 </div>';
                 echo '</div>';
