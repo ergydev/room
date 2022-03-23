@@ -8,6 +8,7 @@ include 'inc/functions.inc.php';
 $liste_categorie = $pdo->query("SELECT DISTINCT categorie FROM produit, salle WHERE salle.id_salle = produit.id_salle ORDER BY categorie");
 
 $liste_ville = $pdo->query("SELECT DISTINCT ville FROM produit, salle WHERE salle.id_salle = produit.id_salle ORDER BY ville");
+$liste_pays = $pdo->query("SELECT DISTINCT pays FROM produit, salle WHERE salle.id_salle = produit.id_salle ORDER BY pays");
 
 $liste_capacite = $pdo->query("SELECT DISTINCT capacite FROM produit, salle WHERE salle.id_salle = produit.id_salle ORDER BY capacite");
 
@@ -71,6 +72,15 @@ include 'inc/nav.inc.php';
             <?php
               while($categorie = $liste_categorie->fetch(PDO::FETCH_ASSOC)){
                 echo '<li class="list-group-item"><a href="?categorie=' . $categorie['categorie'] . '">' . $categorie['categorie'] . '</a></li>';
+              }
+            ?>
+          </ul>
+
+          <h3 class="pb-3 mt-3 border-bottom">Pays</h3>
+          <ul class="list-group filtres">
+            <?php
+              while($pays = $liste_pays->fetch(PDO::FETCH_ASSOC)){
+                echo '<li class="list-group-item"><a href="?pays=' . $pays['pays'] . '">' . $pays['pays'] . '</a></li>';
               }
             ?>
           </ul>

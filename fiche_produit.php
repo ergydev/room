@@ -15,13 +15,10 @@ if ($infos_produit->rowCount() < 1) {
   header('location: index.php');
 }
 
+// Recup info BDD
 $produit = $infos_produit->fetch(PDO::FETCH_ASSOC);
 
-// if($produit['date_arrive']->rowCount()>1  && $produit['date_depart']->rowCount()>1 ){
-//   $produit['etat'] == 'reservation';
-// } else{
-//   $produit['etat'] == 'libre';
-// }
+
 
 //-------------------- DEBUT DES AFFICHAGES
 include 'inc/header.inc.php';
@@ -50,7 +47,7 @@ include 'inc/nav.inc.php';
         <?php
         echo '<div class="col-sm-1">';
         if (user_is_connected()) {
-          echo '<a href=""><button class="btn btn-outline-dark">Réserver</button></a>';
+          echo '<a href="?action=reserver&id_produit=' . $produit['id_produit'] . '&id_membre=' . $_SESSION['membre']['id_membre'] .' "><button class="btn btn-outline-dark">Réserver</button></a>';
         } else {
           echo  '<a href="connexion.php"><button class="btn btn-outline-dark">Connectez-vous Pour Réserver</button></a>';
         }
@@ -111,7 +108,38 @@ include 'inc/nav.inc.php';
           <p class="col-sm-9">
             <?php
             if (user_is_connected()) {
-              echo '<a href="">Déposer un commentaire et une note</a>';
+              echo '<h5>Déposer un commentaire et une note</h5>';
+              echo '<div class="col-sm-12">';
+              echo '<form class="row border p-3" method="post" action"#">';
+              
+              echo '<div class="mb-3">';
+              echo '<label for="commentaire" class="form-label">Ecrivez un commentaire</label>';
+              echo '<textarea class="form-control" id="commentaire" name="commentaire"></textarea>';
+              echo '</div>';
+              
+              echo '<div class="mb-3">';
+              echo '<label for="note" class="form-label">Comment avez vous trouvez vôtre séjour?</label>';
+              echo '<select class="form-select" id="note" name="note">';
+                    echo '<option value="1">1</option>';
+                    echo '<option value="2">2</option>';
+                    echo '<option value="3">3</option>';
+                    echo '<option value="4">4</option>';
+                    echo '<option value="5">5</option>';
+                    echo '<option value="6">6</option>';
+                    echo '<option value="7">7</option>';
+                    echo '<option value="8">8</option>';
+                    echo '<option value="9">9</option>';
+                    echo '<option value="10">10</option>';
+              echo '</select>';
+              echo '</div>';
+
+              echo '<div class="mb-3">';
+              echo '<button type="submit" class="btn btn-outline-dark">Envoyer</button>';
+              echo '</div>';
+
+              
+              echo '</form>';
+              echo '</div>';
             } else {
               echo  '<a href="connexion.php">Connectez-vous pour déposer un avis</button></a>';
             }
