@@ -24,6 +24,11 @@ if(isset($_GET['action']) && $_SESSION['membre']['id_membre'] && isset($_GET['id
   $new_etat = $pdo->prepare("UPDATE produit SET etat = 'reservation' WHERE id_produit = :id_produit");
   $new_etat->bindParam(':id_produit', $_GET['id_produit'],PDO::PARAM_STR);
   $new_etat->execute();
+
+  $new_order= $pdo->prepare("INSERT INTO commande (id_commande, id_membre, id_produit, date_enregistrement) VALUES (NULL, :id_membre, :id_produit, NOW() )");
+  $new_order->bindParam(':id_membre', $_SESSION['membre']['id_membre'], PDO::PARAM_STR);
+  $new_order->bindParam(':id_produit', $_GET['id_produit'], PDO::PARAM_STR);
+  $new_order->execute();
 }
 
 
