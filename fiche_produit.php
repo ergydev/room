@@ -19,6 +19,21 @@ if ($infos_produit->rowCount() < 1) {
 $produit = $infos_produit->fetch(PDO::FETCH_ASSOC);
 
 
+// Reservation 
+if(isset($_GET['action']) && $_SESSION['membre']['id_membre'] && isset($_GET['id_produit']) && $_GET['action'] == 'reserver'){
+  $new_etat = $pdo->prepare("UPDATE produit SET etat = 'reservation' WHERE id_produit = :id_produit");
+  $new_etat->bindParam(':id_produit', $_GET['id_produit'],PDO::PARAM_STR);
+  $new_etat->execute();
+}
+
+
+// COM & RATINGS into BDD 
+
+// if(isset($_POST['commentaire']) && isset($_POST['note'])){
+
+// }
+
+
 
 //-------------------- DEBUT DES AFFICHAGES
 include 'inc/header.inc.php';
