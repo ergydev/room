@@ -25,7 +25,19 @@ a {
     color: white;
 }
 
+.filtres a {
+    text-decoration: none;
+    color: black;
+    text-transform: uppercase;
+}
+
+.product-bot a {
+    text-decoration: none;
+    color: black;
+    
+}
+
 img{
-    max-width: 80%;
+    max-width: 100%;
 }
 
