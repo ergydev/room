@@ -59,12 +59,32 @@ include '../inc/nav.inc.php';
           <tbody>
             <?php 
               while($ligne = $liste_avis->fetch(PDO::FETCH_ASSOC)){
+                if($ligne['note'] < 2 ){
+                  $ligne['note'] = '<i class="fa-solid fa-star-half-stroke"></i>';
+                } elseif($ligne['note'] == 3 ){
+                  $ligne['note'] = '<i class="fa-solid fa-star"></i>';
+                } elseif($ligne['note'] == 4 ){
+                  $ligne['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
+                } elseif($ligne['note'] == 5 ){
+                  $ligne['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
+                } elseif($ligne['note'] == 6 ){
+                  $ligne['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
+                } elseif($ligne['note'] == 7 ){
+                  $ligne['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
+                } elseif($ligne['note'] == 8 ){
+                  $ligne['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
+                } elseif($ligne['note'] == 9 ){
+                  $ligne['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
+                } elseif($ligne['note'] == 10 ){
+                  $ligne['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
+                }
+
                 echo '<tr>';
                 echo '<td class="text-center">' . $ligne['id_avis'] . '</td>';
                 echo '<td class="text-center">' . $ligne['id_membre'] . ' - ' . $ligne['email'] . '</td>';
                 echo '<td class="text-center">' . $ligne['id_salle'] . ' - ' . $ligne['titre'] . '</td>';
                 echo '<td class="text-center">' . $ligne['commentaire'] . '</td>';
-                echo '<td class="text-center">' . $ligne['note'] . '/10' .'</td>';
+                echo '<td class="text-center">' . $ligne['note'] .'</td>';
                 echo '<td class="text-center">' . $ligne['date_enregistrement'] . '</td>';
                 echo '<td class="text-center"><a href=?action=delete&id_avis=' . $ligne['id_avis'] . '" class="btn btn-outline-dark" onclick="return(confirm(\'Êtes-vous sûr de vouloir supprimer cet avis?\'))"><i class="fa-solid fa-ban"></i></a>';
                 echo '</tr>';

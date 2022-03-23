@@ -7,7 +7,7 @@ if (empty($_GET['id_produit'])) {
   header('location: index.php');
 }
 
-$infos_produit = $pdo->prepare("SELECT *  FROM produit, salle WHERE produit.id_salle = salle.id_salle AND id_produit = :id_produit ");
+$infos_produit = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, titre, description, photo, pays, ville, adresse, cp, capacite, categorie, maps  FROM produit, salle WHERE produit.id_salle = salle.id_salle AND id_produit = :id_produit ");
 $infos_produit->bindParam(':id_produit', $_GET['id_produit'], PDO::PARAM_STR);
 $infos_produit->execute();
 
@@ -75,7 +75,11 @@ include 'inc/nav.inc.php';
     <?= $msg; // affichage de message utilisateur 
     ?>
     <div class="row mb-3">
-      <!-- avis -->
+      <?php 
+        // $notes = $pdo->query("SELECT ROUND(AVG(note),0) FROM avis, salle WHERE avis.id_salle = salle.id_salle");
+        // $la_note = $notes->fetch(PDO::FETCH_ASSOC);
+        // echo $la_note['note'];
+      ?>
       <div class="row justify-content-evenly">
         <h2 class="col-sm-9">Découvrez, l'espace <?= $produit['titre'] ?></h2>
         <?php
