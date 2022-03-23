@@ -109,8 +109,16 @@ include 'inc/nav.inc.php';
           <div class="row">
             <?php 
 
+            
+
             if($liste_produits->rowCount()>0){
               while($produit = $liste_produits->fetch(PDO::FETCH_ASSOC)){
+
+                if($produit['etat'] == 'reservation'){
+                  $produit['etat'] = 'Réservé(e)';
+                } else {
+                  $produit['etat'] = 'Disponible';
+                }
 
                 echo '<div class ="col-lg-3 col-md-4 col-sm-6 mb-3">';
                 echo '<div class="card">
