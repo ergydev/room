@@ -29,9 +29,23 @@ if(isset($_GET['action']) && $_SESSION['membre']['id_membre'] && isset($_GET['id
 
 // COM & RATINGS into BDD 
 
-// if(isset($_POST['commentaire']) && isset($_POST['note'])){
+if(isset($_POST['commentaire']) && isset($_POST['note'])){
+$commentaire = trim($_POST['commentaire']);
+$note = trim($_POST['note']);
 
-// }
+$erreur = false;
+
+  if($erreur== false){
+    $req = $pdo->prepare("INSERT INTO avis (id_avis, id_membre, id_salle, commentaire, note, date_enregistrement) VALUES (NULL, :id_membre, :id_salle, :commentaire, :note, NOW() )");
+    $req->bindParam(':id_membre', $_SESSION['membre']['id_membre'], PDO::PARAM_STR);
+    $req->bindParam(':id_salle', $produit['id_salle'], PDO::PARAM_STR);
+    $req->bindParam(':commentaire', $commentaire, PDO::PARAM_STR);
+    $req->bindParam(':note', $note, PDO::PARAM_STR);
+    $req->execute();
+    $msg = '<div class = "alert alert-secondary mb-3">Votre commentaire a bien été posté, merci.</div>';
+
+  }
+}
 
 
 
@@ -57,14 +71,16 @@ include 'inc/nav.inc.php';
     ?>
     <div class="row mb-3">
       <!-- avis -->
-      <div class="row">
-        <h2 class="col-sm-11">Découvrez, l'espace <?= $produit['titre'] ?></h2>
+      <div class="row justify-content-evenly">
+        <h2 class="col-sm-9">Découvrez, l'espace <?= $produit['titre'] ?></h2>
         <?php
-        echo '<div class="col-sm-1">';
-        if (user_is_connected()) {
+        echo '<div class="col-sm">';
+        if (user_is_connected() && $produit['etat'] == 'libre' )  {
           echo '<a href="?action=reserver&id_produit=' . $produit['id_produit'] . '&id_membre=' . $_SESSION['membre']['id_membre'] .' "><button class="btn btn-outline-dark">Réserver</button></a>';
-        } else {
+        } elseif (!user_is_connected() && $produit['etat'] == 'libre' ) {
           echo  '<a href="connexion.php"><button class="btn btn-outline-dark">Connectez-vous Pour Réserver</button></a>';
+        } elseif (user_is_connected() && $produit['etat'] == 'reservation' ) {
+          echo  'Cet espace est indisponible à ses dates <a href="index.php"><button class="btn btn-outline-dark my-2">Retour à l\'accueil</button></a>';
         }
         echo '</div>';
         ?>
