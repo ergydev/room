@@ -18,3 +18,8 @@ function user_is_admin(){
     }
     return false;
 }
+
+
+// crée une commande 
+
+// function 

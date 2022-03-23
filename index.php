@@ -8,6 +8,7 @@ include 'inc/functions.inc.php';
 $liste_categorie = $pdo->query("SELECT DISTINCT categorie FROM produit, salle WHERE salle.id_salle = produit.id_salle ORDER BY categorie");
 
 $liste_ville = $pdo->query("SELECT DISTINCT ville FROM produit, salle WHERE salle.id_salle = produit.id_salle ORDER BY ville");
+$liste_pays = $pdo->query("SELECT DISTINCT pays FROM produit, salle WHERE salle.id_salle = produit.id_salle ORDER BY pays");
 
 $liste_capacite = $pdo->query("SELECT DISTINCT capacite FROM produit, salle WHERE salle.id_salle = produit.id_salle ORDER BY capacite");
 
@@ -75,6 +76,15 @@ include 'inc/nav.inc.php';
             ?>
           </ul>
 
+          <h3 class="pb-3 mt-3 border-bottom">Pays</h3>
+          <ul class="list-group filtres">
+            <?php
+              while($pays = $liste_pays->fetch(PDO::FETCH_ASSOC)){
+                echo '<li class="list-group-item"><a href="?pays=' . $pays['pays'] . '">' . $pays['pays'] . '</a></li>';
+              }
+            ?>
+          </ul>
+
           <h3 class="pb-3 mt-3 border-bottom">Villes</h3>
           <ul class="list-group filtres">
             <?php
@@ -99,18 +109,27 @@ include 'inc/nav.inc.php';
           <div class="row">
             <?php 
 
+            
+
             if($liste_produits->rowCount()>0){
               while($produit = $liste_produits->fetch(PDO::FETCH_ASSOC)){
+
+                if($produit['etat'] == 'reservation'){
+                  $produit['etat'] = 'Réservé(e)';
+                } else {
+                  $produit['etat'] = 'Disponible';
+                }
 
                 echo '<div class ="col-lg-3 col-md-4 col-sm-6 mb-3">';
                 echo '<div class="card">
                 <img src="'. URL . 'assets/img_salles/' . $produit['photo'] . '" class="card-img-top" alt="Image produi : '. $produit['titre'] . '" > <div class="card-body">
                 <h5 class="card-title">' . $produit['titre'] . '</h5>
-                <p class="card-text"><span class="fw-bold">Catégorie : </span>' . $produit['categorie'] . '</p><p class="fw-bold fs-5">Prix : ' . $produit['prix'] . ' €</p>
+                <p class="card-text"> ' . substr($produit['description'], 0 , 30) . '...</p>
+                <p class="fw-bold fs-5">Prix : ' . $produit['prix'] . ' €</p>
                 <p class="card-text"><span class="fw-bold">Jusqu\'à ' . $produit['capacite'] . ' personne(s)</span></p>
                 <p class="card-text"><span class="fw-bold">Actuellement :</span> ' . $produit['etat'] . '</p>
                 <p cmass="card-text"><span class="fw-bold">Réservez du :</span> ' . $produit['date_arrive'] . ' <br> <span class="fw-bold">au</span> ' . $produit['date_arrive'] . '</p>
-                <a href="fiche_produit.php.?id_produit=' . $produit['id_produit']. '" class="btn btn-outline-dark w-100">Réserver</a>
+                <a href="fiche_produit.php.?id_produit=' . $produit['id_produit']. '" class="btn btn-outline-dark w-100">Découvrir</a>
                 </div>
                 </div>';
                 echo '</div>';

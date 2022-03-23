@@ -12,7 +12,7 @@
 
 body{
     box-sizing: border-box;
-    min-height: 75rem;
+    max-height: 1400px;
     padding-top: 4.5rem;
 }
 
