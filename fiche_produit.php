@@ -134,7 +134,7 @@ include 'inc/nav.inc.php';
           <hr>
           <div class="row">
             <?php
-            //exclusion pour le Select, faire une boucle pour afficher un par un les produit/photo
+            //exclusion pour le Select, faire une boucle pour afficher un par un les produit/photo ( WHERE id_produit !=  )
             echo '<div class="d-flex">';
             echo '<a href="" class="mx-2"><img src="' . URL . 'assets/img_salles/' . $produit['photo'] . '"></a> ';
             echo '<a href="" class="mx-2"><img src="' . URL . 'assets/img_salles/' . $produit['photo'] . '"></a> ';

@@ -33,7 +33,7 @@ if(isset($_GET['categorie'])){
   $liste_produits->bindParam(':rechercher', $_GET['rechercher'], PDO::PARAM_STR);
   $liste_produits->execute();
 } else{
-  $liste_produits = $pdo->query("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps FROM produit, salle WHERE salle.id_salle = produit.id_salle  ORDER BY categorie, titre");
+  $liste_produits = $pdo->query("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps, ROUND(AVG(note)) AS note FROM produit, salle LEFT JOIN avis USING (id_salle) WHERE salle.id_salle = produit.id_salle   GROUP BY id_produit ORDER BY categorie, titre");
 }
 
 
@@ -120,6 +120,27 @@ include 'inc/nav.inc.php';
                   $produit['etat'] = 'Disponible';
                 }
 
+                //NOTE 
+                if($produit['note'] < 2 ){
+                  $produit['note'] = '<i class="fa-solid fa-star-half-stroke"></i>';
+                } elseif($produit['note'] == 3 ){
+                  $produit['note'] = '<i class="fa-solid fa-star"></i>';
+                } elseif($produit['note'] == 4 ){
+                  $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
+                } elseif($produit['note'] == 5 ){
+                  $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
+                } elseif($produit['note'] == 6 ){
+                  $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
+                } elseif($produit['note'] == 7 ){
+                  $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
+                } elseif($produit['note'] == 8 ){
+                  $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
+                } elseif($produit['note'] == 9 ){
+                  $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
+                } elseif($produit['note'] == 10 ){
+                  $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
+                }
+
                 
 
                 echo '<div class ="col-lg-3 col-md-4 col-sm-6 mb-3">';
@@ -128,6 +149,7 @@ include 'inc/nav.inc.php';
                 <h5 class="card-title">' . $produit['titre'] . '</h5>
                 <p class="card-text"> ' . substr($produit['description'], 0 , 30) . '...</p>
                 <p class="fw-bold fs-5">Prix : ' . $produit['prix'] . ' €</p>
+                <p class="fw-bold fs-5">' . $produit['note'] . '</p>
                 <p class="card-text"><span class="fw-bold">Jusqu\'à ' . $produit['capacite'] . ' personne(s)</span></p>
                 <p class="card-text"><span class="fw-bold">Actuellement :</span> ' . $produit['etat'] . '</p>
                 <p cmass="card-text"><span class="fw-bold">Réservez du :</span> ' . $produit['date_arrive'] . ' <br> <span class="fw-bold">au</span> ' . $produit['date_arrive'] . '</p>
