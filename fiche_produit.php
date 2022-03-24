@@ -32,6 +32,7 @@ if (isset($_GET['action']) && $_SESSION['membre']['id_membre'] && isset($_GET['i
   $new_order->bindParam(':id_membre', $_SESSION['membre']['id_membre'], PDO::PARAM_STR);
   $new_order->bindParam(':id_produit', $_GET['id_produit'], PDO::PARAM_STR);
   $new_order->execute();
+    header('location : index.php');
 }
 
 
