@@ -124,6 +124,8 @@ include 'inc/nav.inc.php';
         echo '<a href="?action=reserver&id_produit=' . $produit['id_produit'] . '&id_membre=' . $_SESSION['membre']['id_membre'] . ' "><button class="btn btn-outline-dark">Réserver</button></a>';
       } elseif (!user_is_connected() && $produit['etat'] == 'libre') {
         echo  '<a href="connexion.php"><button class="btn btn-outline-dark">Connectez-vous Pour Réserver</button></a>';
+      } elseif (!user_is_connected() && $produit['etat'] == 'reservation') {
+        echo  'Cet espace est indisponible à ces dates <a href="index.php"><button class="btn btn-outline-dark my-2 mx-5">Retour à l\'accueil</button></a>';
       } elseif (user_is_connected() && $produit['etat'] == 'reservation') {
         echo  'Cet espace est indisponible à ces dates <a href="index.php"><button class="btn btn-outline-dark my-2 mx-5">Retour à l\'accueil</button></a>';
       }

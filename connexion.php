@@ -77,15 +77,18 @@ include 'inc/nav.inc.php';
   <div class="col-sm-4 mx-auto">
     <form action="" method="post" class="border  p-5">
       <div class="mb-4">
-        <label for="pseudo" class="label-control">Pseudo</label>
+        <label for="pseudo" class="label-control"><h5>Pseudo</h5></label>
         <input type="text" name="pseudo" id="pseudo" class="form-control" value="<?= $pseudo; ?>">
       </div>
       <div class="mb-4">
-        <label for="mdp" class="label-control">Mot de Passe</label>
-        <input type="text" name="mdp" id="mdp" class="form-control" value="">
+        <label for="mdp" class="label-control"><h5>Mot de Passe</h5></label>
+        <input type="password" name="mdp" id="mdp" class="form-control" value="">
       </div>
-      <div class="mb-4">
+      <div class="mb-4 text-center">
         <button class="btn btn-outline-dark" id="connexion">Connexion</button>
+      </div>
+      <div class="mb-3 mt-4">
+        <p class="text-center">Vous n'avez pas encore de compte? <a href="inscription.php" class="text-secondary">Inscrivez-vous</a></p>
       </div>
     </form>
   </div>
