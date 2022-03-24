@@ -26,7 +26,7 @@ $date = date('Y-m-d');
 // ----- DELETE PRODUCT 
 //------------------------
 
-if(isset($_GET['action']) && isset($_GET['action']) == 'delete' && !empty($_GET['id_produit'])){
+if(isset($_GET['action']) && $_GET['action'] == 'delete' && !empty($_GET['id_produit'])){
     $del = $pdo->prepare("SELECT * FROM produit WHERE id_produit = :id_produit");
     $del->bindParam(':id_produit', $_GET['id_produit'], PDO::PARAM_STR);
     $del->execute();

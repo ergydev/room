@@ -7,7 +7,7 @@ if (empty($_GET['id_produit'])) {
   header('location: index.php');
 }
 
-$infos_produit = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, titre, description, photo, pays, ville, adresse, cp, capacite, categorie, maps  FROM produit, salle WHERE produit.id_salle = salle.id_salle AND id_produit = :id_produit ");
+$infos_produit = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, titre, description, photo, pays, ville, adresse, cp, capacite, categorie, maps, ROUND(AVG(note)) AS note FROM produit, salle LEFT JOIN avis USING (id_salle) WHERE produit.id_salle = salle.id_salle AND id_produit = :id_produit GROUP BY id_produit ");
 $infos_produit->bindParam(':id_produit', $_GET['id_produit'], PDO::PARAM_STR);
 $infos_produit->execute();
 
@@ -19,13 +19,16 @@ if ($infos_produit->rowCount() < 1) {
 $produit = $infos_produit->fetch(PDO::FETCH_ASSOC);
 
 
+// NOTES 
+
+
 // Reservation 
-if(isset($_GET['action']) && $_SESSION['membre']['id_membre'] && isset($_GET['id_produit']) && $_GET['action'] == 'reserver'){
+if (isset($_GET['action']) && $_SESSION['membre']['id_membre'] && isset($_GET['id_produit']) && $_GET['action'] == 'reserver') {
   $new_etat = $pdo->prepare("UPDATE produit SET etat = 'reservation' WHERE id_produit = :id_produit");
-  $new_etat->bindParam(':id_produit', $_GET['id_produit'],PDO::PARAM_STR);
+  $new_etat->bindParam(':id_produit', $_GET['id_produit'], PDO::PARAM_STR);
   $new_etat->execute();
 
-  $new_order= $pdo->prepare("INSERT INTO commande (id_commande, id_membre, id_produit, date_enregistrement) VALUES (NULL, :id_membre, :id_produit, NOW() )");
+  $new_order = $pdo->prepare("INSERT INTO commande (id_commande, id_membre, id_produit, date_enregistrement) VALUES (NULL, :id_membre, :id_produit, NOW() )");
   $new_order->bindParam(':id_membre', $_SESSION['membre']['id_membre'], PDO::PARAM_STR);
   $new_order->bindParam(':id_produit', $_GET['id_produit'], PDO::PARAM_STR);
   $new_order->execute();
@@ -34,13 +37,13 @@ if(isset($_GET['action']) && $_SESSION['membre']['id_membre'] && isset($_GET['id
 
 // COM & RATINGS into BDD 
 
-if(isset($_POST['commentaire']) && isset($_POST['note'])){
-$commentaire = trim($_POST['commentaire']);
-$note = trim($_POST['note']);
+if (isset($_POST['commentaire']) && isset($_POST['note'])) {
+  $commentaire = trim($_POST['commentaire']);
+  $note = trim($_POST['note']);
 
-$erreur = false;
+  $erreur = false;
 
-  if($erreur== false){
+  if ($erreur == false) {
     $req = $pdo->prepare("INSERT INTO avis (id_avis, id_membre, id_salle, commentaire, note, date_enregistrement) VALUES (NULL, :id_membre, :id_salle, :commentaire, :note, NOW() )");
     $req->bindParam(':id_membre', $_SESSION['membre']['id_membre'], PDO::PARAM_STR);
     $req->bindParam(':id_salle', $produit['id_salle'], PDO::PARAM_STR);
@@ -48,9 +51,14 @@ $erreur = false;
     $req->bindParam(':note', $note, PDO::PARAM_STR);
     $req->execute();
     $msg = '<div class = "alert alert-secondary mb-3">Votre commentaire a bien été posté, merci.</div>';
-
   }
 }
+
+// Autres produits 
+$liste_recom = $pdo->prepare("SELECT  photo, id_produit, titre, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive  FROM  produit, salle WHERE salle.id_salle = produit.id_salle AND id_produit != :id_produit LIMIT 4");
+$liste_recom->bindParam(':id_produit', $_GET['id_produit'], PDO::PARAM_STR);
+$liste_recom->execute();
+
 
 
 
@@ -75,26 +83,52 @@ include 'inc/nav.inc.php';
     <?= $msg; // affichage de message utilisateur 
     ?>
     <div class="row mb-3">
-      <?php 
-        // $notes = $pdo->query("SELECT ROUND(AVG(note),0) FROM avis, salle WHERE avis.id_salle = salle.id_salle");
-        // $la_note = $notes->fetch(PDO::FETCH_ASSOC);
-        // echo $la_note['note'];
-      ?>
-      <div class="row justify-content-evenly">
-        <h2 class="col-sm-9">Découvrez, l'espace <?= $produit['titre'] ?></h2>
-        <?php
-        echo '<div class="col-sm">';
-        if (user_is_connected() && $produit['etat'] == 'libre' )  {
-          echo '<a href="?action=reserver&id_produit=' . $produit['id_produit'] . '&id_membre=' . $_SESSION['membre']['id_membre'] .' "><button class="btn btn-outline-dark">Réserver</button></a>';
-        } elseif (!user_is_connected() && $produit['etat'] == 'libre' ) {
-          echo  '<a href="connexion.php"><button class="btn btn-outline-dark">Connectez-vous Pour Réserver</button></a>';
-        } elseif (user_is_connected() && $produit['etat'] == 'reservation' ) {
-          echo  'Cet espace est indisponible à ses dates <a href="index.php"><button class="btn btn-outline-dark my-2">Retour à l\'accueil</button></a>';
-        }
-        echo '</div>';
-        ?>
-        <hr>
+      <div class="row col-sm-9">
+        <div class="col-sm">
+          <h2 class="">Découvrez, l'espace <?= $produit['titre'] ?></h2>
+        </div>
+        <div class="col-sm-6">
+          <?php
+          if (empty($produit['note'])) {
+            $produit['note'] == 'hidden';
+          } elseif ($produit['note'] < 2) {
+            $produit['note'] = '<i class="fa-solid fa-star-half-stroke"></i>';
+          } elseif ($produit['note'] == 3) {
+            $produit['note'] = '<i class="fa-solid fa-star"></i>';
+          } elseif ($produit['note'] == 4) {
+            $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
+          } elseif ($produit['note'] == 5) {
+            $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
+          } elseif ($produit['note'] == 6) {
+            $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
+          } elseif ($produit['note'] == 7) {
+            $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
+          } elseif ($produit['note'] == 8) {
+            $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
+          } elseif ($produit['note'] == 9) {
+            $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
+          } elseif ($produit['note'] == 10) {
+            $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
+          }
+          echo '<p class="fs-5">' . $produit['note'] . '</p>';
+          ?>
+        </div>
+
       </div>
+      <?php
+
+      echo '<div class="col-sm">';
+
+      if (user_is_connected() && $produit['etat'] == 'libre') {
+        echo '<a href="?action=reserver&id_produit=' . $produit['id_produit'] . '&id_membre=' . $_SESSION['membre']['id_membre'] . ' "><button class="btn btn-outline-dark">Réserver</button></a>';
+      } elseif (!user_is_connected() && $produit['etat'] == 'libre') {
+        echo  '<a href="connexion.php"><button class="btn btn-outline-dark">Connectez-vous Pour Réserver</button></a>';
+      } elseif (user_is_connected() && $produit['etat'] == 'reservation') {
+        echo  'Cet espace est indisponible à ces dates <a href="index.php"><button class="btn btn-outline-dark my-2 mx-5">Retour à l\'accueil</button></a>';
+      }
+      echo '</div>';
+      ?>
+      <hr>
     </div>
     <div class="row">
 
@@ -134,13 +168,17 @@ include 'inc/nav.inc.php';
           <hr>
           <div class="row">
             <?php
-            //exclusion pour le Select, faire une boucle pour afficher un par un les produit/photo
+            // while($produit)
             echo '<div class="d-flex">';
-            echo '<a href="" class="mx-2"><img src="' . URL . 'assets/img_salles/' . $produit['photo'] . '"></a> ';
-            echo '<a href="" class="mx-2"><img src="' . URL . 'assets/img_salles/' . $produit['photo'] . '"></a> ';
-            echo '<a href="" class="mx-2"><img src="' . URL . 'assets/img_salles/' . $produit['photo'] . '"></a> ';
-            echo '<a href="" class="mx-2"><img src="' . URL . 'assets/img_salles/' . $produit['photo'] . '"></a> ';
+            while ($recom = $liste_recom->fetch(PDO::FETCH_ASSOC)) {
+              echo '<div class="link_recom mx-2">';
+              echo '<a href="?id_produit=' . $recom['id_produit'] . '" class=""><img src="' . URL . 'assets/img_salles/' . $recom['photo'] . '"></a> ';
+              echo '<h5 class="pt-2 fw-bold"><a href="?id_produit=' . $recom['id_produit'] . '" class="mx-2">' . $recom['titre'] . '</a></h5>';
+              echo '<p><a href="?id_produit=' . $recom['id_produit'] . '" class="mx-2">Disponible à partir du ' . $recom['date_arrive'] . '</a></p>';
+              echo '</div>';
+            }
             echo '</div>';
+            //exclusion pour le Select, faire une boucle pour afficher un par un les produit/photo ( WHERE id_produit !=  )
             ?>
           </div>
         </div>
@@ -152,25 +190,25 @@ include 'inc/nav.inc.php';
               echo '<h5>Déposer un commentaire et une note</h5>';
               echo '<div class="col-sm-12">';
               echo '<form class="row border p-3" method="post" action"#">';
-              
+
               echo '<div class="mb-3">';
               echo '<label for="commentaire" class="form-label">Ecrivez un commentaire</label>';
               echo '<textarea class="form-control" id="commentaire" name="commentaire"></textarea>';
               echo '</div>';
-              
+
               echo '<div class="mb-3">';
               echo '<label for="note" class="form-label">Comment avez vous trouvez vôtre séjour?</label>';
               echo '<select class="form-select" id="note" name="note">';
-                    echo '<option value="1">1</option>';
-                    echo '<option value="2">2</option>';
-                    echo '<option value="3">3</option>';
-                    echo '<option value="4">4</option>';
-                    echo '<option value="5">5</option>';
-                    echo '<option value="6">6</option>';
-                    echo '<option value="7">7</option>';
-                    echo '<option value="8">8</option>';
-                    echo '<option value="9">9</option>';
-                    echo '<option value="10">10</option>';
+              echo '<option value="1">1</option>';
+              echo '<option value="2">2</option>';
+              echo '<option value="3">3</option>';
+              echo '<option value="4">4</option>';
+              echo '<option value="5">5</option>';
+              echo '<option value="6">6</option>';
+              echo '<option value="7">7</option>';
+              echo '<option value="8">8</option>';
+              echo '<option value="9">9</option>';
+              echo '<option value="10">10</option>';
               echo '</select>';
               echo '</div>';
 
@@ -178,7 +216,7 @@ include 'inc/nav.inc.php';
               echo '<button type="submit" class="btn btn-outline-dark">Envoyer</button>';
               echo '</div>';
 
-              
+
               echo '</form>';
               echo '</div>';
             } else {

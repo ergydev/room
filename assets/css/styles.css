@@ -36,6 +36,11 @@ a {
     color: black;
     
 }
+.link_recom a {
+    text-decoration: none;
+    color: black;
+    
+}
 
 img{
     max-width: 100%;
