@@ -16,24 +16,24 @@ $liste_capacite = $pdo->query("SELECT DISTINCT capacite FROM produit, salle WHER
 // Recup des produits 
 
 if(isset($_GET['categorie'])){
-  $liste_produits = $pdo->prepare("SELECT * FROM produit, salle WHERE salle.id_salle = produit.id_salle AND categorie = :categorie ORDER BY categorie ");
+  $liste_produits = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps FROM produit, salle WHERE salle.id_salle = produit.id_salle AND categorie = :categorie ORDER BY categorie ");
   $liste_produits->bindParam(':categorie', $_GET['categorie'], PDO::PARAM_STR);
   $liste_produits->execute();
 } elseif (isset($_GET['ville'])){
-  $liste_produits = $pdo->prepare("SELECT * FROM produit, salle WHERE salle.id_salle = produit.id_salle AND ville = :ville ORDER BY ville");
+  $liste_produits = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps FROM produit, salle WHERE salle.id_salle = produit.id_salle AND ville = :ville ORDER BY ville");
   $liste_produits->bindParam(':ville', $_GET['ville'], PDO::PARAM_STR);
   $liste_produits->execute();
 } elseif (isset($_GET['capacite'])){
-  $liste_produits = $pdo->prepare("SELECT * FROM produit, salle WHERE salle.id_salle = produit.id_salle AND capacite = :capacite ORDER BY capacite");
+  $liste_produits = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps FROM produit, salle WHERE salle.id_salle = produit.id_salle AND capacite = :capacite ORDER BY capacite");
   $liste_produits->bindParam(':capacite', $_GET['capacite'], PDO::PARAM_STR);
   $liste_produits->execute();
 } elseif (isset($_GET['rechercher'])){
-  $liste_produits = $pdo->prepare("SELECT * FROM produit, salle WHERE salle.id_salle = produit.id_salle AND (titre LIKE :rechercher OR description LIKE :rechercher) ORDER BY categorie, titre");
+  $liste_produits = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps FROM produit, salle WHERE salle.id_salle = produit.id_salle AND (titre LIKE :rechercher OR description LIKE :rechercher) ORDER BY categorie, titre");
   $rechercher = '%' . $_GET['rechercher'] . '%';
   $liste_produits->bindParam(':rechercher', $_GET['rechercher'], PDO::PARAM_STR);
   $liste_produits->execute();
 } else{
-  $liste_produits = $pdo->query("SELECT * FROM produit, salle WHERE salle.id_salle = produit.id_salle ORDER BY categorie, titre");
+  $liste_produits = $pdo->query("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps FROM produit, salle WHERE salle.id_salle = produit.id_salle  ORDER BY categorie, titre");
 }
 
 
@@ -119,6 +119,8 @@ include 'inc/nav.inc.php';
                 } else {
                   $produit['etat'] = 'Disponible';
                 }
+
+                
 
                 echo '<div class ="col-lg-3 col-md-4 col-sm-6 mb-3">';
                 echo '<div class="card">

@@ -16,6 +16,15 @@ $commentaire = "";
 $note = "";
 $date_enregistrement = "";
 
+//DELETE AVIS
+if(isset($_GET['action']) && $_GET['action'] == 'delete'  && isset($_GET['id_avis'])){ 
+  $del = $pdo->prepare("DELETE FROM avis WHERE id_avis = :id_avis");
+  $del->bindParam(':id_avis', $_GET['id_avis'], PDO::PARAM_STR);
+  $del->execute();
+  $msg = '<div class = "alert alert-secondary mb-3">Cette avis a bien été supprimé</div>';
+
+}
+
 // Recup liste des Avis 
 $liste_avis = $pdo->query("SELECT id_avis, avis.id_membre, email, titre , salle.id_salle , commentaire, note, date_format(avis.date_enregistrement, '%d/%m/%Y %H:%i') AS date_enregistrement FROM avis, salle, membre WHERE avis.id_salle = salle.id_salle AND membre.id_membre = avis.id_membre");
 

@@ -31,7 +31,7 @@ if(isset($_GET['action']) && isset($_GET['statut']) && isset($_GET['action']) ==
 // -----------------------
 // Delete account 
 //------------------------
-if (isset($_GET['action']) && isset($_GET['id_membre']) && isset($_GET['action']) == 'delete'){
+if (isset($_GET['action']) && isset($_GET['id_membre']) && $_GET['action'] == 'delete'){
   $del = $pdo->prepare("DELETE FROM membre WHERE id_membre = :id_membre");
   $del->bindParam(':id_membre', $_GET['id_membre'], PDO::PARAM_STR);
   $del->execute();
