@@ -25,6 +25,8 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete'  && isset($_GET['id_com
 $liste_order = $pdo->query("SELECT id_commande, commande.id_membre, produit.id_produit, date_format(commande.date_enregistrement, '%d/%m/%Y %H:%i') AS date_enregistrement, prix, titre, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart , email FROM commande, produit, membre, salle WHERE produit.id_produit = commande.id_produit AND commande.id_membre = membre.id_membre");
 
 
+
+
 //-------------------- DEBUT DES AFFICHAGES
 include '../inc/header.inc.php';
 include '../inc/nav.inc.php';
