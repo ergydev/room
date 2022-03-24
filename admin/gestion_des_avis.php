@@ -68,7 +68,9 @@ include '../inc/nav.inc.php';
           <tbody>
             <?php 
               while($ligne = $liste_avis->fetch(PDO::FETCH_ASSOC)){
-                if($ligne['note'] < 2 ){
+                if(empty($ligne['note'])){
+                  $ligne['note'] = 'Cet espace n\'a pas été noté';
+                } elseif($ligne['note'] < 2  ){
                   $ligne['note'] = '<i class="fa-solid fa-star-half-stroke"></i>';
                 } elseif($ligne['note'] == 3 ){
                   $ligne['note'] = '<i class="fa-solid fa-star"></i>';

@@ -16,19 +16,19 @@ $liste_capacite = $pdo->query("SELECT DISTINCT capacite FROM produit, salle WHER
 // Recup des produits 
 
 if(isset($_GET['categorie'])){
-  $liste_produits = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps FROM produit, salle WHERE salle.id_salle = produit.id_salle AND categorie = :categorie ORDER BY categorie ");
+  $liste_produits = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps,  ROUND(AVG(note)) AS note  FROM produit, salle LEFT JOIN avis USING (id_salle) WHERE salle.id_salle = produit.id_salle AND categorie = :categorie GROUP BY id_produit ORDER BY categorie ");
   $liste_produits->bindParam(':categorie', $_GET['categorie'], PDO::PARAM_STR);
   $liste_produits->execute();
 } elseif (isset($_GET['ville'])){
-  $liste_produits = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps FROM produit, salle WHERE salle.id_salle = produit.id_salle AND ville = :ville ORDER BY ville");
+  $liste_produits = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps,  ROUND(AVG(note)) AS note  FROM produit, salle LEFT JOIN avis USING (id_salle) WHERE salle.id_salle = produit.id_salle AND ville = :ville GROUP BY id_produit ORDER BY ville");
   $liste_produits->bindParam(':ville', $_GET['ville'], PDO::PARAM_STR);
   $liste_produits->execute();
 } elseif (isset($_GET['capacite'])){
-  $liste_produits = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps FROM produit, salle WHERE salle.id_salle = produit.id_salle AND capacite = :capacite ORDER BY capacite");
+  $liste_produits = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps,  ROUND(AVG(note)) AS note  FROM produit, salle LEFT JOIN avis USING (id_salle) WHERE salle.id_salle = produit.id_salle AND capacite = :capacite GROUP BY id_produit ORDER BY capacite");
   $liste_produits->bindParam(':capacite', $_GET['capacite'], PDO::PARAM_STR);
   $liste_produits->execute();
 } elseif (isset($_GET['rechercher'])){
-  $liste_produits = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps FROM produit, salle WHERE salle.id_salle = produit.id_salle AND (titre LIKE :rechercher OR description LIKE :rechercher) ORDER BY categorie, titre");
+  $liste_produits = $pdo->prepare("SELECT produit.id_produit, salle.id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive, date_format(date_depart, '%d/%m/%Y %H:%i') AS date_depart, prix, etat, salle.titre, description, photo, pays, ville, adresse, cp, capacite, salle.categorie, maps,  ROUND(AVG(note)) AS note  FROM produit, salle LEFT JOIN avis USING (id_salle) WHERE salle.id_salle = produit.id_salle AND (titre LIKE :rechercher OR description LIKE :rechercher) GROUP BY id_produit ORDER BY categorie, titre");
   $rechercher = '%' . $_GET['rechercher'] . '%';
   $liste_produits->bindParam(':rechercher', $_GET['rechercher'], PDO::PARAM_STR);
   $liste_produits->execute();
@@ -121,23 +121,25 @@ include 'inc/nav.inc.php';
                 }
 
                 //NOTE 
-                if($produit['note'] < 2 ){
+                if (empty($produit['note'])) {
+                  $produit['note'] == 'hidden';
+                } elseif ($produit['note'] < 2) {
                   $produit['note'] = '<i class="fa-solid fa-star-half-stroke"></i>';
-                } elseif($produit['note'] == 3 ){
+                } elseif ($produit['note'] == 3) {
                   $produit['note'] = '<i class="fa-solid fa-star"></i>';
-                } elseif($produit['note'] == 4 ){
+                } elseif ($produit['note'] == 4) {
                   $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
-                } elseif($produit['note'] == 5 ){
+                } elseif ($produit['note'] == 5) {
                   $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
-                } elseif($produit['note'] == 6 ){
+                } elseif ($produit['note'] == 6) {
                   $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
-                } elseif($produit['note'] == 7 ){
+                } elseif ($produit['note'] == 7) {
                   $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
-                } elseif($produit['note'] == 8 ){
+                } elseif ($produit['note'] == 8) {
                   $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
-                } elseif($produit['note'] == 9 ){
+                } elseif ($produit['note'] == 9) {
                   $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>';
-                } elseif($produit['note'] == 10 ){
+                } elseif ($produit['note'] == 10) {
                   $produit['note'] = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
                 }
 
@@ -149,7 +151,7 @@ include 'inc/nav.inc.php';
                 <h5 class="card-title">' . $produit['titre'] . '</h5>
                 <p class="card-text"> ' . substr($produit['description'], 0 , 30) . '...</p>
                 <p class="fw-bold fs-5">Prix : ' . $produit['prix'] . ' €</p>
-                <p class="fw-bold fs-5">' . $produit['note'] . '</p>
+                <p class="">' . $produit['note'] . '</p>
                 <p class="card-text"><span class="fw-bold">Jusqu\'à ' . $produit['capacite'] . ' personne(s)</span></p>
                 <p class="card-text"><span class="fw-bold">Actuellement :</span> ' . $produit['etat'] . '</p>
                 <p cmass="card-text"><span class="fw-bold">Réservez du :</span> ' . $produit['date_arrive'] . ' <br> <span class="fw-bold">au</span> ' . $produit['date_arrive'] . '</p>
