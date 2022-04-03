@@ -32,7 +32,7 @@ if (isset($_GET['action']) && $_SESSION['membre']['id_membre'] && isset($_GET['i
   $new_order->bindParam(':id_membre', $_SESSION['membre']['id_membre'], PDO::PARAM_STR);
   $new_order->bindParam(':id_produit', $_GET['id_produit'], PDO::PARAM_STR);
   $new_order->execute();
-    header('location : index.php');
+  header('location: index.php');
 }
 
 
@@ -59,6 +59,10 @@ if (isset($_POST['commentaire']) && isset($_POST['note'])) {
 $liste_recom = $pdo->prepare("SELECT  photo, id_produit, titre, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_arrive  FROM  produit, salle WHERE salle.id_salle = produit.id_salle AND id_produit != :id_produit LIMIT 4");
 $liste_recom->bindParam(':id_produit', $_GET['id_produit'], PDO::PARAM_STR);
 $liste_recom->execute();
+
+
+// Latest commentaites 
+$liste_com = $pdo->prepare("SELECT pseudo, commentaire, note, date_format(avis.date_enregistrement, '%d/%m/%Y %H:%i') AS date_enregistrement FROM avis, salle WHERE avis.id_salle = salle.id_salle  ORDER BY avis.date_enregistrement ");
 
 
 
@@ -186,6 +190,8 @@ include 'inc/nav.inc.php';
           </div>
         </div>
         <hr>
+
+        <!-- New Commentaires section  -->
         <div class="row product-bot">
           <p class="col-sm-9">
             <?php

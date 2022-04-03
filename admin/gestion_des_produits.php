@@ -126,7 +126,7 @@ if (isset($_POST['date_arrive']) && isset($_POST['date_depart']) && isset($_POST
 
 
 // RECUP DES INFOS EN BDD 
-$infos_produit = $pdo->query("SELECT id_produit, id_salle, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_ar , date_format(date_depart, '%d/%m/%Y %H:%i') AS date_dp, prix, etat FROM produit ORDER BY id_produit");
+$infos_produit = $pdo->query("SELECT id_produit, produit.id_salle, titre, photo, date_format(date_arrive, '%d/%m/%Y %H:%i') AS date_ar , date_format(date_depart, '%d/%m/%Y %H:%i') AS date_dp, prix, etat FROM produit, salle WHERE produit.id_salle = salle.id_salle ORDER BY date_arrive");
 
 // echo '<pre>';
 // print_r($_GET);
@@ -193,13 +193,13 @@ include '../inc/nav.inc.php';
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>ID produit</th>
-                                    <th>Date d'arrivée</th>
-                                    <th>Date de départ</th>
-                                    <th>ID Salle</th>
-                                    <th>Prix</th>
-                                    <th>Etat</th>
-                                    <th>Actions</th>
+                                    <th class="text-center">ID produit</th>
+                                    <th class="text-center">Date d'arrivée</th>
+                                    <th class="text-center">Date de départ</th>
+                                    <th class="text-center">ID Salle</th>
+                                    <th class="text-center">Prix</th>
+                                    <th class="text-center">Etat</th>
+                                    <th class="text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -207,12 +207,12 @@ include '../inc/nav.inc.php';
 
                                     while ($ligne = $infos_produit->fetch(PDO::FETCH_ASSOC)){
                                         echo '<tr>';
-                                        echo '<td>' . $ligne['id_produit'] . '</td>';
-                                        echo '<td>' . $ligne['date_ar'] . '</td>';
-                                        echo '<td>' . $ligne['date_dp'] . '</td>';
-                                        echo '<td>' . $ligne['id_salle'] . '</td>';
-                                        echo '<td>' . $ligne['prix'] . ' €' . '</td>';
-                                        echo '<td>' . 'libre' . '</td>';
+                                        echo '<td class="text-center">' . $ligne['id_produit'] . '</td>';
+                                        echo '<td class="text-center">' . $ligne['date_ar'] . '</td>';
+                                        echo '<td class="text-center">' . $ligne['date_dp'] . '</td>';
+                                        echo '<td class="text-center">' . $ligne['id_salle'] . ' - '. $ligne['titre'] . '<br><img src="' . URL . '/assets/img_salles/'.  $ligne['photo'] .  '" width="100"></img></td>';
+                                        echo '<td class="text-center">' . $ligne['prix'] . ' €' . '</td>';
+                                        echo '<td class="text-center">' . 'libre' . '</td>';
 
                                         echo '<td class="mx-3"> <a href="?action=edit&id_produit=' . $ligne['id_produit'] . '"class="btn btn-outline-dark"> <i class="fa-solid fa-pen-to-square"></i></a> <a href="?action=delete&id_produit=' . $ligne['id_produit'] . '"class="btn btn-outline-dark" onclick="return(confirm(\'Êtes-vous sûr de vouloir supprimer cette salle?\'))"> <i class="fa-solid fa-ban"></i></a> </td>';
                                         echo '</tr>';
